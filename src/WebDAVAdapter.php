@@ -290,8 +290,14 @@ class WebDAVAdapter extends AbstractAdapter
         array_shift($response);
         $result = [];
 
+        $clientPathPrefix = ltrim(parse_url($this->client->getAbsoluteUrl(''), PHP_URL_PATH), '/');
+
         foreach ($response as $path => $object) {
-            $path = $this->removePathPrefix(rawurldecode($path));
+            $path = rawurldecode($path);
+            if (substr($path, strlen($clientPathPrefix) == $clientPathPrefix)) {
+                $path = substr($path, strlen($clientPathPrefix));
+            }
+            $path = $this->removePathPrefix($path);
             $object = $this->normalizeObject($object, $path);
             $result[] = $object;
 
